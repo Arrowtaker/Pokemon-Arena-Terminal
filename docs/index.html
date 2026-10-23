@@ -260,7 +260,7 @@
                 <div class="economy-strip" aria-live="polite">
                     <div class="economy-stat"><span>Gold balance</span><strong id="gold-balance">0 G</strong></div>
                     <div class="economy-stat"><span>Login streak</span><strong id="streak-count">0 days</strong></div>
-                    <p class="daily-note" id="daily-note">Daily login: +50 G, streak bonus +10 G per day.</p>
+                    <p class="daily-note" id="daily-note">Daily login: +10 G, streak bonus +10 G per day.</p>
                 </div>
                 <div class="collection-list" id="collection-list"></div>
             </section>
@@ -499,7 +499,7 @@
             const yesterday = new Date();
             yesterday.setDate(yesterday.getDate() - 1);
             gameState.streak = gameState.lastRewardDate === localDateKey(yesterday) ? gameState.streak + 1 : 1;
-            const reward = 50 + (gameState.streak - 1) * 10;
+            const reward = 10 + (gameState.streak - 1) * 10;
             gameState.gold += reward;
             gameState.lastRewardDate = today;
             return reward;
