@@ -110,6 +110,16 @@
         .collection-count { flex: 0 0 auto; color: var(--muted); font-family: var(--mono); font-size: 10px; }
         .collection-rarity { grid-column: 1 / -1; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
         .collection-empty { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+        .badge-section { margin-top: 16px; padding-top: 13px; border-top: 1px solid rgba(183, 206, 173, .12); }
+        .badge-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 7px; margin-top: 9px; }
+        .badge-item { padding: 8px 9px; border: 1px solid rgba(183, 206, 173, .12); background: rgba(21, 32, 25, .55); }
+        .badge-title { display: flex; align-items: center; gap: 8px; }
+        .badge-image { width: 34px; height: 34px; object-fit: contain; image-rendering: pixelated; }
+        .badge-item:not(.is-owned) .badge-image { filter: grayscale(1); opacity: .45; }
+        .badge-item strong { font-size: 10px; font-weight: 600; }
+        .badge-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.4; }
+        .badge-item.is-owned { border-color: rgba(212, 250, 114, .45); }
+        .badge-item.is-owned strong { color: var(--lime); }
         .sell-button { grid-column: 1 / -1; min-height: 30px; padding: 0 8px; color: var(--lime); border: 1px solid #46564a; background: #152019; font-size: 10px; cursor: pointer; }
         .sell-button:hover:not(:disabled) { border-color: var(--lime); }
         .sell-button:disabled { color: var(--muted); cursor: not-allowed; opacity: .5; }
@@ -132,6 +142,7 @@
         .shop-item button:hover:not(:disabled) { border-color: var(--lime); }
         .shop-item button:disabled { color: var(--muted); cursor: not-allowed; opacity: .5; }
         .developer-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 7px; }
+        .developer-badge-form { margin-top: 8px; }
         .developer-input { min-width: 0; height: 35px; padding: 0 8px; color: var(--ink); border: 1px solid #46564a; outline: 0; background: #152019; font-family: var(--mono); font-size: 11px; }
         .developer-input:focus { border-color: var(--lime); }
         .developer-form button { padding: 0 9px; color: var(--lime); border: 1px solid #46564a; background: #152019; font-size: 10px; cursor: pointer; }
@@ -263,6 +274,10 @@
                     <p class="daily-note" id="daily-note">Daily login: +10 G, streak bonus +10 G per day.</p>
                 </div>
                 <div class="collection-list" id="collection-list"></div>
+                <div class="badge-section" aria-labelledby="badges-heading">
+                    <h3 class="sidebar-heading" id="badges-heading">Badges</h3>
+                    <div class="badge-list" id="badge-list" aria-live="polite"></div>
+                </div>
             </section>
 
             <section class="panel roll-panel" aria-labelledby="roll-heading">
@@ -324,13 +339,18 @@
                 </section>
 
                 <section class="panel sidebar-panel" aria-labelledby="developer-heading">
-                    <h2 class="sidebar-heading" id="developer-heading"><span><span class="section-index">DEV</span> Gold credit</span></h2>
+                    <h2 class="sidebar-heading" id="developer-heading"><span><span class="section-index">DEV</span> Developer menu</span></h2>
                     <form class="developer-form" id="developer-form">
                         <label class="visually-hidden" for="developer-gold">Gold amount</label>
                         <input class="developer-input" id="developer-gold" type="number" min="1" max="1000000" step="1" placeholder="Gold amount" required>
                         <button type="submit">Add free</button>
                     </form>
-                    <p class="developer-message" id="developer-message" aria-live="polite">Local testing cheat; adds gold without a charge.</p>
+                    <form class="developer-form developer-badge-form" id="developer-badge-form">
+                        <label class="visually-hidden" for="developer-badge-code">Badge code</label>
+                        <input class="developer-input" id="developer-badge-code" type="text" placeholder="Badge code" autocomplete="off" required>
+                        <button type="submit">Grant badge</button>
+                    </form>
+                    <p class="developer-message" id="developer-message" aria-live="polite">Local testing menu. Badge codes: boulder, cascade.</p>
                 </section>
             </aside>
         </div>
@@ -340,25 +360,29 @@
 
     <script>
         const ORES = [
-            { name: "Stone", rarity: "Common", color: "#a4aaa3", weight: 50, image: "Rock.png" },
-            { name: "Copper", rarity: "Uncommon", color: "#55c878", weight: 15, image: "Copper Bar.png" },
-            { name: "Iron", rarity: "Uncommon", color: "#55c878", weight: 8, image: "Iron Bar.png" },
-            { name: "Gold", rarity: "Rare", color: "#58aaf2", weight: 3.5, image: "Gold Bar.png" },
+            { name: "Stone", rarity: "Common", color: "#a4aaa3", weight: 80, image: "Rock.png" },
+            { name: "Copper", rarity: "Uncommon", color: "#55c878", weight: 35, image: "Copper Bar.png" },
+            { name: "Iron", rarity: "Uncommon", color: "#55c878", weight: 10, image: "Iron Bar.png" },
+            { name: "Gold", rarity: "Rare", color: "#58aaf2", weight: 3, image: "Gold Bar.png" },
             { name: "Coral Ore", rarity: "Epic", color: "#bd79e8", weight: 1, image: "Coral Bar.png" },
             { name: "Moonstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Moonstone Bar.png" },
             { name: "Searstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Searstone Bar.png" },
-            { name: "Mega Crystal", rarity: "Mythic", color: "#f05252", weight: 0.05, image: "Mega Stone-Photoroom.png" }
+            { name: "Mega Crystal", rarity: "Mythic", color: "#f05252", weight: 0.02, image: "Mega Stone-Photoroom.png" }
         ];
         const ORE_SELL_PRICES = {
             Stone: 1,
-            Copper: 10,
+            Copper: 5,
             Iron: 25,
             Gold: 60,
-            "Coral Ore": 100,
+            "Coral Ore": 80,
             Moonstone: 200,
             Searstone: 200,
             "Mega Crystal": 500
         };
+        const BADGES = [
+            { code: "boulder", name: "Boulder Badge", description: "Stone sells for 2 gold.", image: "Boulder_Badge.webp" },
+            { code: "cascade", name: "Cascade Badge", description: "Coral Ore has weight 2 when rolling.", image: "Cascade_Badge.webp" }
+        ];
         const SHOP_ITEMS = [
             { id: "potion", name: "Potion", description: "A healing potion for your next expedition.", price: 10 },
             { id: "pokemon", name: "Random Pokémon", description: "Add a randomly selected Pokémon to your roster.", price: 100 },
@@ -386,6 +410,7 @@
             batchSize: document.querySelector("#batch-size"),
             historyList: document.querySelector("#history-list"),
             collectionList: document.querySelector("#collection-list"),
+            badgeList: document.querySelector("#badge-list"),
             progressTotal: document.querySelector("#progress-total"),
             goldBalance: document.querySelector("#gold-balance"),
             streakCount: document.querySelector("#streak-count"),
@@ -396,6 +421,8 @@
             recipeRequirement: document.querySelector("#recipe-requirement"),
             developerForm: document.querySelector("#developer-form"),
             developerGold: document.querySelector("#developer-gold"),
+            developerBadgeForm: document.querySelector("#developer-badge-form"),
+            developerBadgeCode: document.querySelector("#developer-badge-code"),
             developerMessage: document.querySelector("#developer-message")
         };
 
@@ -410,7 +437,7 @@
         let totalRolls = 0;
 
         function emptyGameState() {
-            return { totalRolls: 0, inventory: {}, items: { potion: 0, battlefield: 0, polishedMegaStone: 0 }, pokemon: [], history: [], gold: 0, streak: 0, lastRewardDate: null };
+            return { totalRolls: 0, inventory: {}, items: { potion: 0, battlefield: 0, polishedMegaStone: 0 }, pokemon: [], history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
         }
 
         function accountKey(username) {
@@ -455,7 +482,8 @@
                         history: Array.isArray(saved.history) ? saved.history.slice(0, 24) : [],
                         gold: Math.max(0, Number(saved.gold) || 0),
                         streak: Math.max(0, Number(saved.streak) || 0),
-                        lastRewardDate: typeof saved.lastRewardDate === "string" ? saved.lastRewardDate : null
+                        lastRewardDate: typeof saved.lastRewardDate === "string" ? saved.lastRewardDate : null,
+                        badges: Array.isArray(saved.badges) ? [...new Set(saved.badges.filter(code => BADGES.some(badge => badge.code === code)))] : []
                     };
                 }
             } catch (error) {
@@ -481,6 +509,7 @@
             elements.rollCounter.textContent = `ROLL ${String(gameState.totalRolls).padStart(3, "0")}`;
             renderHistory();
             renderCollection();
+            renderBadges();
             renderSidebar();
             updateEconomy(dailyReward);
             saveGameState();
@@ -563,10 +592,11 @@
         }
 
         function pickOre() {
-            const total = ORES.reduce((sum, ore) => sum + ore.weight, 0);
+            const weightOf = ore => ore.name === "Coral Ore" && gameState.badges.includes("cascade") ? 2 : ore.weight;
+            const total = ORES.reduce((sum, ore) => sum + weightOf(ore), 0);
             let threshold = Math.random() * total;
             for (const ore of ORES) {
-                threshold -= ore.weight;
+                threshold -= weightOf(ore);
                 if (threshold < 0) return ore;
             }
             return ORES.at(-1);
@@ -634,12 +664,38 @@
                 const sellButton = document.createElement("button");
                 sellButton.className = "sell-button";
                 sellButton.type = "button";
-                sellButton.textContent = `Sell 1 · ${ORE_SELL_PRICES[ore.name]} G`;
+                sellButton.textContent = `Sell 1 · ${getOreSellPrice(ore.name)} G`;
                 sellButton.disabled = Number(gameState.inventory[ore.name]) < 1;
                 sellButton.addEventListener("click", () => sellOre(ore.name));
                 item.append(oreLabel, count, rarity, sellButton);
                 elements.collectionList.append(item);
             });
+        }
+
+        function renderBadges() {
+            elements.badgeList.replaceChildren();
+            BADGES.forEach(badge => {
+                const owned = gameState.badges.includes(badge.code);
+                const item = document.createElement("div");
+                item.className = `badge-item${owned ? " is-owned" : ""}`;
+                const title = document.createElement("div");
+                title.className = "badge-title";
+                const image = document.createElement("img");
+                image.className = "badge-image";
+                image.src = badge.image;
+                image.alt = "";
+                const name = document.createElement("strong");
+                name.textContent = `${badge.name}${owned ? " · Owned" : ""}`;
+                title.append(image, name);
+                const description = document.createElement("span");
+                description.textContent = badge.description;
+                item.append(title, description);
+                elements.badgeList.append(item);
+            });
+        }
+
+        function getOreSellPrice(name) {
+            return name === "Stone" && gameState.badges.includes("boulder") ? 2 : ORE_SELL_PRICES[name];
         }
 
         function renderSidebar() {
@@ -674,7 +730,7 @@
             const count = Number(gameState.inventory[name]) || 0;
             if (count < 1) return;
             gameState.inventory[name] = count - 1;
-            gameState.gold += ORE_SELL_PRICES[name];
+            gameState.gold += getOreSellPrice(name);
             saveGameState();
             renderCollection();
             updateEconomy();
@@ -714,6 +770,26 @@
             elements.developerMessage.textContent = `${Math.min(amount, 1000000)} gold credited.`;
             saveGameState();
             updateEconomy();
+        }
+
+        function grantDeveloperBadge(event) {
+            event.preventDefault();
+            const code = elements.developerBadgeCode.value.trim().toLowerCase();
+            const badge = BADGES.find(item => item.code === code);
+            if (!badge) {
+                elements.developerMessage.textContent = "Unknown badge code. Use boulder or cascade.";
+                return;
+            }
+            if (gameState.badges.includes(badge.code)) {
+                elements.developerMessage.textContent = `${badge.name} is already owned by this player.`;
+                return;
+            }
+            gameState.badges.push(badge.code);
+            elements.developerBadgeCode.value = "";
+            elements.developerMessage.textContent = `${badge.name} granted.`;
+            saveGameState();
+            renderBadges();
+            renderCollection();
         }
 
         function createOreVisual(ore, imageClass, fallbackColor = "#a4aaa3") {
@@ -795,6 +871,7 @@
         document.querySelector("#sign-out").addEventListener("click", leaveGame);
         document.querySelector("#craft-mega-stone").addEventListener("click", craftPolishedMegaStone);
         elements.developerForm.addEventListener("submit", addDeveloperGold);
+        elements.developerBadgeForm.addEventListener("submit", grantDeveloperBadge);
         elements.rollButton.addEventListener("click", roll);
         document.querySelector("#batch-down").addEventListener("click", () => {
             batchSize = Math.max(1, batchSize - 1);
