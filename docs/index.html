@@ -69,6 +69,31 @@
         .eyebrow::before { width: 23px; height: 1px; content: ""; background: currentColor; }
         h1 { margin: 13px 0 8px; font-size: clamp(36px, 5vw, 56px); line-height: 1; letter-spacing: 0; }
         .intro { max-width: 560px; margin: 0; color: #aab3a4; font-size: 15px; line-height: 1.65; }
+        .event-banner { display: none; width: min(540px, 100%); min-height: 136px; align-items: center; margin-top: 10px; padding: 0 12px; }
+        .event-note { position: relative; z-index: 1; width: min(340px, calc(100% - 90px)); margin: 0; padding: 9px 11px; font-size: 11px; line-height: 1.5; }
+        body.halloween-theme .event-banner { display: flex; background: radial-gradient(ellipse at 82% 55%, rgba(136, 75, 139, .2), transparent 43%); }
+        body.halloween-theme .event-note { color: #ffd3a4; border: 1px solid rgba(255, 155, 66, .3); background: rgba(74, 41, 67, .72); }
+        body.halloween-theme { --ink: #f4eee8; --muted: #aa9caf; --line: #49364e; --panel: #211a2b; --panel-soft: #2a2035; --ground: #110d18; --lime: #ff9b42; --rust: #df7bff; }
+        body.halloween-theme { background-image: linear-gradient(rgba(255, 155, 66, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 155, 66, .035) 1px, transparent 1px), radial-gradient(ellipse at 16% 0%, rgba(115, 66, 145, .22), transparent 40%); }
+        body.halloween-theme .topbar { border-bottom-color: rgba(190, 142, 204, .18); background: rgba(17, 13, 24, .88); }
+        body.halloween-theme .live-dot { box-shadow: 0 0 10px rgba(255, 155, 66, .75); }
+        body.halloween-theme .intro { color: #c0b4c4; }
+        body.halloween-theme .panel { background: rgba(33, 26, 43, .96); }
+        body.halloween-theme .field-label { color: #d0c5d2; }
+        body.halloween-theme .auth-input { border-color: #59445f; background: #191321; }
+        body.halloween-theme .economy-strip { border-color: rgba(190, 142, 204, .16); background: rgba(25, 19, 33, .7); }
+        body.halloween-theme .daily-note { color: #c4b8c8; }
+        body.halloween-theme .collection-item, body.halloween-theme .badge-item, body.halloween-theme .shop-item { border-color: rgba(190, 142, 204, .14); background: rgba(25, 19, 33, .7); }
+        body.halloween-theme .badge-section { border-top-color: rgba(190, 142, 204, .14); }
+        body.halloween-theme .badge-item.is-owned { border-color: rgba(255, 155, 66, .5); }
+        body.halloween-theme .sell-button, body.halloween-theme .shop-item button, body.halloween-theme .developer-input, body.halloween-theme .developer-form button, body.halloween-theme .batch-control { border-color: #59445f; background: #191321; }
+        body.halloween-theme .recipe-item { border-color: rgba(190, 142, 204, .14); }
+        body.halloween-theme .specimen { background: radial-gradient(ellipse at center, color-mix(in srgb, var(--ore-color, var(--lime)) 12%, transparent), transparent 62%), #1b1424; }
+        body.halloween-theme .primary-button { color: #281507; }
+        body.halloween-theme .primary-button:hover { background: #ffb469; }
+        body.halloween-theme .history-item { border-bottom-color: rgba(190, 142, 204, .1); }
+        body.halloween-theme .footer-line { color: #877a8c; }
+        body.halloween-theme .footer-line span:last-child { color: #b59bbf; }
 
         .workspace { display: grid; width: min(1180px, 100%); grid-template-columns: minmax(0, 1fr) minmax(300px, 360px); gap: 18px; margin-top: 38px; align-items: start; }
         .game-main, .game-sidebar { display: grid; min-width: 0; gap: 18px; }
@@ -94,8 +119,12 @@
         .auth-error { min-height: 16px; margin: 0; color: var(--rust); font-size: 11px; }
         .auth-note { margin: 13px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
         .game-area[hidden], [hidden] { display: none !important; }
-        .progress-panel { padding: 17px 20px 19px; }
+        .progress-panel { position: relative; z-index: 1; padding: 17px 20px 19px; }
         .progress-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+        .collection-mimikyu { display: none; position: absolute; z-index: 2; top: -48px; left: 8px; width: 108px; height: 132px; object-fit: contain; pointer-events: none; }
+        body.halloween-theme .collection-mimikyu { display: block; filter: drop-shadow(0 5px 9px rgba(255, 155, 66, .18)) drop-shadow(0 0 12px rgba(186, 110, 213, .16)); }
+        .progress-heading { padding-left: 0; }
+        body.halloween-theme .progress-heading { padding-left: 88px; }
         .progress-total { color: var(--lime); font-family: var(--mono); font-size: 11px; }
         .economy-strip { display: grid; grid-template-columns: 1fr 1fr minmax(150px, 1.4fr); align-items: center; gap: 14px; margin-top: 16px; padding: 13px 14px; border: 1px solid rgba(183, 206, 173, .13); background: rgba(21, 32, 25, .55); }
         .economy-stat { display: grid; gap: 4px; }
@@ -136,8 +165,10 @@
         .owned-label { margin: 10px 0 0; color: var(--muted); font-family: var(--mono); font-size: 10px; }
         .shop-items { display: grid; gap: 8px; }
         .shop-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 7px 10px; padding: 10px; border: 1px solid rgba(183, 206, 173, .12); background: rgba(21, 32, 25, .55); }
+        .shop-item.is-locked { opacity: .55; }
         .shop-item strong { font-size: 11px; font-weight: 600; }
         .shop-item p { margin: 3px 0 0; color: var(--muted); font-size: 10px; line-height: 1.35; }
+        .shop-item-owned { display: block; margin-top: 4px; color: var(--muted); font-family: var(--mono); font-size: 9px; }
         .shop-item button { grid-row: span 2; min-width: 82px; min-height: 32px; padding: 0 7px; color: var(--lime); border: 1px solid #46564a; background: #152019; font-size: 10px; cursor: pointer; }
         .shop-item button:hover:not(:disabled) { border-color: var(--lime); }
         .shop-item button:disabled { color: var(--muted); cursor: not-allowed; opacity: .5; }
@@ -213,6 +244,8 @@
             main { width: 92vw; padding-top: 34px; }
             h1 { font-size: 38px; }
             .intro { font-size: 14px; }
+            body.halloween-theme .collection-mimikyu { top: -30px; left: 6px; width: 78px; height: 96px; }
+            body.halloween-theme .progress-heading { padding-left: 62px; font-size: 12px; }
             .roll-controls { padding-right: 14px; padding-left: 14px; }
             .progress-panel { padding-right: 13px; padding-left: 13px; }
             .economy-strip { grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px; }
@@ -240,6 +273,9 @@
         <div class="eyebrow">Mineral discovery arena</div>
         <h1>Pokemon Arena Terminal</h1>
         <p class="intro">Break new ground and see what turns up. Every discovery is drawn from a weighted pool.</p>
+        <div class="event-banner">
+            <p class="event-note" role="status">Halloween event active: Ghost- and Dark-type Pokémon have an increased chance of appearing.</p>
+        </div>
 
         <section class="panel auth-panel" id="auth-panel" aria-labelledby="auth-title">
             <h2 class="auth-title" id="auth-title">Welcome, prospector</h2>
@@ -265,7 +301,8 @@
             <div class="game-main">
             <section class="panel progress-panel" aria-labelledby="progress-heading">
                 <div class="progress-top">
-                    <h2 class="section-heading" id="progress-heading"><span class="section-index">01</span> Ore collection</h2>
+                    <h2 class="section-heading progress-heading" id="progress-heading"><span class="section-index">01</span> Ore collection</h2>
+                    <img class="collection-mimikyu" src="mimikyu.png" alt="Mimikyu perched over the ore collection title">
                     <span class="progress-total" id="progress-total">0 discoveries</span>
                 </div>
                 <div class="economy-strip" aria-live="polite">
@@ -385,10 +422,10 @@
         ];
         const SHOP_ITEMS = [
             { id: "potion", name: "Potion", description: "A healing potion for your next expedition.", price: 10 },
-            { id: "pokemon", name: "Random Pokémon", description: "Add a randomly selected Pokémon to your roster.", price: 100 },
+            { id: "pokemon", name: "Random Pokémon", description: "A mystery collectible for your item stash.", price: 100 },
+            { id: "greatball", name: "Random Pokémon (Great Ball)", description: "A Great Ball collectible. Requires the Boulder and Cascade Badges.", price: 150, requiredBadges: ["boulder", "cascade"] },
             { id: "battlefield", name: "Battlefield", description: "Unlock a battlefield for future encounters.", price: 500 }
         ];
-        const RANDOM_POKEMON = ["Pikachu", "Eevee", "Charmander", "Bulbasaur", "Squirtle", "Snorlax", "Gengar", "Lucario"];
 
         const elements = {
             accountBar: document.querySelector("#account-bar"),
@@ -430,14 +467,30 @@
         const accountPrefix = "oreworks-account:";
         const progressPrefix = "oreworks-progress:";
         const activeUserKey = "oreworks-active-user";
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
         let authMode = "login";
         let currentUser = null;
         let gameState = emptyGameState();
         let batchSize = 1;
         let totalRolls = 0;
 
+        function isHalloweenEventActive(date = new Date()) {
+            return date.getMonth() === 9;
+        }
+
+        function updateSeasonalTheme() {
+            const now = new Date();
+            const halloweenActive = isHalloweenEventActive(now);
+            document.body.classList.toggle("halloween-theme", halloweenActive);
+            themeColorMeta.content = halloweenActive ? "#110d18" : "#121c17";
+            const nextLocalDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+            window.setTimeout(updateSeasonalTheme, nextLocalDay - now);
+        }
+
+        updateSeasonalTheme();
+
         function emptyGameState() {
-            return { totalRolls: 0, inventory: {}, items: { potion: 0, battlefield: 0, polishedMegaStone: 0 }, pokemon: [], history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
+            return { totalRolls: 0, inventory: {}, items: { potion: 0, pokemon: 0, greatball: 0, battlefield: 0, polishedMegaStone: 0 }, history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
         }
 
         function accountKey(username) {
@@ -478,7 +531,6 @@
                         totalRolls: Math.max(0, Number(saved.totalRolls) || 0),
                         inventory: saved.inventory && typeof saved.inventory === "object" ? saved.inventory : {},
                         items: { ...emptyGameState().items, ...(saved.items || {}) },
-                        pokemon: Array.isArray(saved.pokemon) ? saved.pokemon : [],
                         history: Array.isArray(saved.history) ? saved.history.slice(0, 24) : [],
                         gold: Math.max(0, Number(saved.gold) || 0),
                         streak: Math.max(0, Number(saved.streak) || 0),
@@ -592,7 +644,11 @@
         }
 
         function pickOre() {
-            const weightOf = ore => ore.name === "Coral Ore" && gameState.badges.includes("cascade") ? 2 : ore.weight;
+            const weightOf = ore => {
+                if (ore.name === "Moonstone" && isHalloweenEventActive()) return 0.35;
+                if (ore.name === "Coral Ore" && gameState.badges.includes("cascade")) return 2;
+                return ore.weight;
+            };
             const total = ORES.reduce((sum, ore) => sum + weightOf(ore), 0);
             let threshold = Math.random() * total;
             for (const ore of ORES) {
@@ -698,21 +754,32 @@
             return name === "Stone" && gameState.badges.includes("boulder") ? 2 : ORE_SELL_PRICES[name];
         }
 
+        function isShopItemUnlocked(shopItem) {
+            return !shopItem.requiredBadges || shopItem.requiredBadges.every(code => gameState.badges.includes(code));
+        }
+
         function renderSidebar() {
             elements.shopItems.replaceChildren();
             SHOP_ITEMS.forEach(shopItem => {
+                const unlocked = isShopItemUnlocked(shopItem);
                 const row = document.createElement("div");
-                row.className = "shop-item";
+                row.className = `shop-item${unlocked ? "" : " is-locked"}`;
                 const details = document.createElement("div");
                 const title = document.createElement("strong");
                 title.textContent = shopItem.name;
                 const description = document.createElement("p");
                 description.textContent = shopItem.description;
                 details.append(title, description);
+                if (shopItem.id === "pokemon" || shopItem.id === "greatball") {
+                    const owned = document.createElement("span");
+                    owned.className = "shop-item-owned";
+                    owned.textContent = `Owned: ${Number(gameState.items[shopItem.id]) || 0}`;
+                    details.append(owned);
+                }
                 const button = document.createElement("button");
                 button.type = "button";
-                button.textContent = `Buy · ${shopItem.price} G`;
-                button.disabled = gameState.gold < shopItem.price;
+                button.textContent = unlocked ? `Buy · ${shopItem.price} G` : "Locked";
+                button.disabled = !unlocked || gameState.gold < shopItem.price;
                 button.addEventListener("click", () => buyShopItem(shopItem.id));
                 row.append(details, button);
                 elements.shopItems.append(row);
@@ -738,13 +805,9 @@
 
         function buyShopItem(id) {
             const shopItem = SHOP_ITEMS.find(item => item.id === id);
-            if (!shopItem || gameState.gold < shopItem.price) return;
+            if (!shopItem || !isShopItemUnlocked(shopItem) || gameState.gold < shopItem.price) return;
             gameState.gold -= shopItem.price;
-            if (id === "pokemon") {
-                gameState.pokemon.push(RANDOM_POKEMON[Math.floor(Math.random() * RANDOM_POKEMON.length)]);
-            } else {
-                gameState.items[id] = (Number(gameState.items[id]) || 0) + 1;
-            }
+            gameState.items[id] = (Number(gameState.items[id]) || 0) + 1;
             saveGameState();
             updateEconomy();
         }
@@ -790,6 +853,7 @@
             saveGameState();
             renderBadges();
             renderCollection();
+            renderSidebar();
         }
 
         function createOreVisual(ore, imageClass, fallbackColor = "#a4aaa3") {
