@@ -138,7 +138,21 @@
         .collection-ore strong { overflow: hidden; font-size: 11px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
         .collection-count { flex: 0 0 auto; color: var(--muted); font-family: var(--mono); font-size: 10px; }
         .collection-rarity { grid-column: 1 / -1; font-family: var(--mono); font-size: 9px; letter-spacing: .08em; text-transform: uppercase; }
+        .rarity-display { display: inline-flex; align-items: center; gap: 5px; }
+        .rarity-sparkle { flex: 0 0 auto; width: 14px; height: 14px; object-fit: contain; }
         .collection-empty { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+        .journal-panel { padding: 17px 20px 19px; }
+        .journal-heading { justify-content: space-between; }
+        .journal-progress { color: var(--muted); font-family: var(--mono); font-size: 10px; }
+        .journal-rarity { margin-top: 16px; }
+        .journal-rarity:first-child { margin-top: 14px; }
+        .journal-rarity-heading { margin: 0 0 8px; font-size: 11px; font-weight: 600; }
+        .journal-ores { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 7px; }
+        .journal-ore { display: flex; min-width: 0; align-items: center; gap: 8px; padding: 8px; border: 1px solid rgba(183, 206, 173, .12); background: rgba(21, 32, 25, .55); }
+        .journal-ore .ore-thumbnail, .journal-ore .ore-thumbnail-fallback { width: 34px; height: 34px; }
+        .journal-ore-name { overflow: hidden; font-size: 10px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+        .journal-ore.is-undiscovered .ore-thumbnail, .journal-ore.is-undiscovered .ore-thumbnail-fallback { filter: grayscale(1); opacity: .4; }
+        .journal-ore.is-undiscovered .journal-ore-name { color: var(--muted); }
         .badge-section { margin-top: 16px; padding-top: 13px; border-top: 1px solid rgba(183, 206, 173, .12); }
         .badge-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 7px; margin-top: 9px; }
         .badge-item { padding: 8px 9px; border: 1px solid rgba(183, 206, 173, .12); background: rgba(21, 32, 25, .55); }
@@ -203,7 +217,7 @@
         .ore-fallback { width: 76px; height: 76px; color: var(--ore-color, var(--lime)); }
         .specimen.is-rolling .specimen-image, .specimen.is-rolling .ore-fallback { animation: spin .65s cubic-bezier(.2,.7,.3,1); }
         .result-name { z-index: 1; margin-top: 13px; font-size: 22px; font-weight: 700; }
-        .result-caption { z-index: 1; margin-top: 5px; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+        .result-caption { z-index: 1; display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 5px; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
         .roll-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 18px 20px 20px; }
         .primary-button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; color: #172019; border: 0; background: var(--lime); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .18s, transform .18s; }
         .primary-button:hover { background: #e2ff9c; transform: translateY(-1px); }
@@ -317,10 +331,18 @@
                 </div>
             </section>
 
+            <section class="panel journal-panel" aria-labelledby="journal-heading">
+                <div class="progress-top">
+                    <h2 class="section-heading journal-heading" id="journal-heading"><span class="section-index">02</span> Collection journal</h2>
+                    <span class="journal-progress" id="journal-progress"></span>
+                </div>
+                <div id="journal-list"></div>
+            </section>
+
             <section class="panel roll-panel" aria-labelledby="roll-heading">
                 <div class="roll-head">
                     <div>
-                        <span class="section-index">02 / EXTRACTION</span>
+                        <span class="section-index">03 / EXTRACTION</span>
                         <h2 class="section-heading" id="roll-heading">Make a discovery</h2>
                     </div>
                     <span class="roll-counter" id="roll-counter">ROLL 000</span>
@@ -349,7 +371,7 @@
 
             <section class="panel history-panel" aria-labelledby="history-heading">
                 <div class="history-head">
-                        <h2 class="section-heading" id="history-heading"><span class="section-index">03</span> Recent finds</h2>
+                        <h2 class="section-heading" id="history-heading"><span class="section-index">04</span> Recent finds</h2>
                     <button class="clear-button" id="clear-history" type="button">Clear</button>
                 </div>
                 <div class="history-list" id="history-list" aria-live="polite"><div class="history-empty">No samples recorded yet.</div></div>
@@ -357,7 +379,7 @@
             </div>
             <aside class="game-sidebar" aria-label="Recipes and shop">
                 <section class="panel sidebar-panel" aria-labelledby="recipe-heading">
-                    <h2 class="sidebar-heading" id="recipe-heading"><span><span class="section-index">04</span> Recipe sheet</span><span class="subtle" id="crafted-count">0 crafted</span></h2>
+                    <h2 class="sidebar-heading" id="recipe-heading"><span><span class="section-index">05</span> Recipe sheet</span><span class="subtle" id="crafted-count">0 crafted</span></h2>
                     <div class="recipe-item">
                         <img class="recipe-image" src="Mega Stone-Photoroom.png" alt="Mega Stone">
                         <div>
@@ -371,7 +393,7 @@
                 </section>
 
                 <section class="panel sidebar-panel" aria-labelledby="shop-heading">
-                    <h2 class="sidebar-heading" id="shop-heading"><span><span class="section-index">05</span> Field shop</span></h2>
+                    <h2 class="sidebar-heading" id="shop-heading"><span><span class="section-index">06</span> Field shop</span></h2>
                     <div class="shop-items" id="shop-items"></div>
                 </section>
 
@@ -405,8 +427,16 @@
             { name: "Coral Ore", rarity: "Epic", color: "#bd79e8", weight: 1, image: "Coral Bar.png" },
             { name: "Moonstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Moonstone Bar.png" },
             { name: "Searstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Searstone Bar.png" },
-            { name: "Mega Crystal", rarity: "Mythic", color: "#f05252", weight: 0.02, image: "Mega Stone-Photoroom.png" }
+            { name: "Mega Crystal", rarity: "Champion", color: "#f05252", weight: 0.05, image: "Mega Stone-Photoroom.png" }
         ];
+        const RARITY_SPARKLE_IMAGES = {
+            Common: "Common Sparkle.png",
+            Uncommon: "Uncommon Sparkle.png",
+            Rare: "Rare Sparkle.png",
+            Epic: "Epic Sparkle.png",
+            Legendary: "Legendary Sparkle.png",
+            Champion: "Champion Sparkle.png"
+        };
         const ORE_SELL_PRICES = {
             Stone: 1,
             Copper: 5,
@@ -449,6 +479,8 @@
             batchSize: document.querySelector("#batch-size"),
             historyList: document.querySelector("#history-list"),
             collectionList: document.querySelector("#collection-list"),
+            journalList: document.querySelector("#journal-list"),
+            journalProgress: document.querySelector("#journal-progress"),
             badgeList: document.querySelector("#badge-list"),
             progressTotal: document.querySelector("#progress-total"),
             goldBalance: document.querySelector("#gold-balance"),
@@ -683,9 +715,7 @@
                 meta.className = "result-meta";
                 const number = document.createElement("span");
                 number.textContent = `#${String(entry.number).padStart(3, "0")}`;
-                const rarity = document.createElement("span");
-                rarity.textContent = ore?.rarity || "Unknown";
-                rarity.style.color = ore?.color || "#a4aaa3";
+                const rarity = createRarityDisplay(ore?.rarity || "Unknown", ore?.color || "#a4aaa3");
                 meta.append(rarity, number);
                 item.append(main, meta);
                 elements.historyList.append(item);
@@ -696,6 +726,7 @@
             elements.collectionList.replaceChildren();
             const discovered = ORES.filter(ore => Number(gameState.inventory[ore.name]) > 0);
             elements.progressTotal.textContent = `${gameState.totalRolls} ${gameState.totalRolls === 1 ? "discovery" : "discoveries"}`;
+            renderJournal(discovered);
             if (!discovered.length) {
                 const empty = document.createElement("span");
                 empty.className = "collection-empty";
@@ -715,10 +746,7 @@
                 const count = document.createElement("span");
                 count.className = "collection-count";
                 count.textContent = `×${gameState.inventory[ore.name]}`;
-                const rarity = document.createElement("span");
-                rarity.className = "collection-rarity";
-                rarity.textContent = ore.rarity;
-                rarity.style.color = ore.color;
+                const rarity = createRarityDisplay(ore.rarity, ore.color, "collection-rarity");
                 const sellButton = document.createElement("button");
                 sellButton.className = "sell-button";
                 sellButton.type = "button";
@@ -728,6 +756,65 @@
                 item.append(oreLabel, count, rarity, sellButton);
                 elements.collectionList.append(item);
             });
+        }
+
+        function renderJournal(discovered) {
+            elements.journalList.replaceChildren();
+            elements.journalProgress.textContent = `${discovered.length} / ${ORES.length} discovered`;
+
+            const oresByRarity = new Map();
+            for (const ore of ORES) {
+                if (!oresByRarity.has(ore.rarity)) oresByRarity.set(ore.rarity, []);
+                oresByRarity.get(ore.rarity).push(ore);
+            }
+
+            for (const [rarityName, ores] of oresByRarity) {
+                const section = document.createElement("section");
+                section.className = "journal-rarity";
+                const heading = document.createElement("h3");
+                heading.className = "journal-rarity-heading";
+                heading.append(createRarityDisplay(rarityName, ores[0].color));
+
+                const oreList = document.createElement("div");
+                oreList.className = "journal-ores";
+                for (const ore of ores) {
+                    const isDiscovered = Number(gameState.inventory[ore.name]) > 0;
+                    const item = document.createElement("div");
+                    item.className = `journal-ore${isDiscovered ? "" : " is-undiscovered"}`;
+                    item.setAttribute("role", "group");
+                    item.setAttribute("aria-label", `${ore.name}, ${rarityName}${isDiscovered ? ", discovered" : ", not discovered"}`);
+                    const visual = createOreVisual(ore, "journal-thumbnail");
+                    const name = document.createElement("span");
+                    name.className = "journal-ore-name";
+                    name.textContent = ore.name;
+                    item.append(visual, name);
+                    oreList.append(item);
+                }
+
+                section.append(heading, oreList);
+                elements.journalList.append(section);
+            }
+        }
+
+        function createRarityDisplay(rarityName, color, className = "") {
+            const rarity = document.createElement("span");
+            rarity.className = `rarity-display${className ? ` ${className}` : ""}`;
+            rarity.style.color = color;
+
+            const sparkleImage = RARITY_SPARKLE_IMAGES[rarityName];
+            if (sparkleImage) {
+                const sparkle = document.createElement("img");
+                sparkle.className = "rarity-sparkle";
+                sparkle.src = sparkleImage;
+                sparkle.alt = "";
+                sparkle.setAttribute("aria-hidden", "true");
+                rarity.append(sparkle);
+            }
+
+            const label = document.createElement("span");
+            label.textContent = rarityName;
+            rarity.append(label);
+            return rarity;
         }
 
         function renderBadges() {
@@ -909,7 +996,10 @@
             const latest = results.at(-1);
             displayOre(latest.ore);
             elements.resultName.textContent = latest.ore.name;
-            elements.resultCaption.textContent = `${latest.ore.rarity} discovery`;
+            elements.resultCaption.replaceChildren(
+                createRarityDisplay(latest.ore.rarity, latest.ore.color),
+                document.createTextNode(" discovery")
+            );
             elements.resultCaption.style.color = latest.ore.color;
             elements.rollCounter.textContent = `ROLL ${String(gameState.totalRolls).padStart(3, "0")}`;
             elements.specimen.classList.remove("is-rolling");
