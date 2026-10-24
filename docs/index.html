@@ -101,7 +101,9 @@
         .section-heading { gap: 10px; margin: 0; font-size: 14px; font-weight: 600; }
         .section-index { color: var(--lime); font-family: var(--mono); font-size: 10px; }
         .ore-swatch { flex: 0 0 auto; width: 9px; height: 9px; background: var(--ore-color, var(--lime)); transform: rotate(45deg); }
-        .ore-thumbnail { display: block; flex: 0 0 auto; object-fit: contain; image-rendering: pixelated; }
+        .ore-thumbnail, .specimen-image, .badge-image, .recipe-image, .rarity-sparkle { display: block; max-width: 100%; object-fit: contain; image-rendering: pixelated; }
+        .ore-thumbnail { flex: 0 0 auto; }
+        .ore-thumbnail.coal-thumbnail, .specimen-image.coal-thumbnail { transform: scale(2); }
         .ore-thumbnail-fallback { flex: 0 0 auto; background: var(--ore-color, var(--lime)); clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%); }
         .collection-thumbnail, .collection-thumbnail-fallback { width: 40px; height: 40px; }
         .history-thumbnail, .history-thumbnail-fallback { width: 32px; height: 32px; }
@@ -163,7 +165,8 @@
         .badge-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.4; }
         .badge-item.is-owned { border-color: rgba(212, 250, 114, .45); }
         .badge-item.is-owned strong { color: var(--lime); }
-        .sell-button { grid-column: 1 / -1; min-height: 30px; padding: 0 8px; color: var(--lime); border: 1px solid #46564a; background: #152019; font-size: 10px; cursor: pointer; }
+        .sell-actions { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .sell-button { min-height: 30px; padding: 0 8px; color: var(--lime); border: 1px solid #46564a; background: #152019; font-size: 10px; cursor: pointer; }
         .sell-button:hover:not(:disabled) { border-color: var(--lime); }
         .sell-button:disabled { color: var(--muted); cursor: not-allowed; opacity: .5; }
 
@@ -420,6 +423,7 @@
     <script>
         const ORES = [
             { name: "Stone", rarity: "Common", color: "#a4aaa3", weight: 80, image: "Rock.png" },
+            { name: "Coal", rarity: "Common", color: "#a4aaa3", weight: 45, image: "Coal Ore.png" },
             { name: "Copper", rarity: "Uncommon", color: "#55c878", weight: 35, image: "Copper Bar.png" },
             { name: "Iron", rarity: "Uncommon", color: "#55c878", weight: 10, image: "Iron Bar.png" },
             { name: "Gold", rarity: "Rare", color: "#58aaf2", weight: 3, image: "Gold Bar.png" },
@@ -439,7 +443,8 @@
         };
         const ORE_SELL_PRICES = {
             Stone: 1,
-            Copper: 5,
+            Coal: 3,
+            Copper: 7,
             Iron: 25,
             Gold: 60,
             Quartz: 70,
@@ -524,7 +529,15 @@
         updateSeasonalTheme();
 
         function emptyGameState() {
-            return { totalRolls: 0, inventory: {}, items: { potion: 0, pokemon: 0, greatball: 0, battlefield: 0, polishedMegaStone: 0 }, history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
+            return { totalRolls: 0, inventory: {}, discoveredOres: [], items: { potion: 0, pokemon: 0, greatball: 0, battlefield: 0, polishedMegaStone: 0 }, history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
+        }
+
+        function assetPath(filename) {
+            if (!filename) return "";
+            if (typeof window !== "undefined" && window.location) {
+                return new URL(filename, window.location.href).toString();
+            }
+            return filename;
         }
 
         function accountKey(username) {
@@ -561,11 +574,20 @@
             try {
                 const saved = JSON.parse(localStorage.getItem(progressKey(username)) || "null");
                 if (saved && typeof saved === "object") {
+                    const inventory = saved.inventory && typeof saved.inventory === "object" ? saved.inventory : {};
+                    const history = Array.isArray(saved.history) ? saved.history.slice(0, 24) : [];
+                    const discoveredOres = new Set(Array.isArray(saved.discoveredOres) ? saved.discoveredOres : []);
+                    for (const ore of ORES) {
+                        if (Number(inventory[ore.name]) > 0 || history.some(entry => entry?.name === ore.name)) {
+                            discoveredOres.add(ore.name);
+                        }
+                    }
                     return {
                         totalRolls: Math.max(0, Number(saved.totalRolls) || 0),
-                        inventory: saved.inventory && typeof saved.inventory === "object" ? saved.inventory : {},
+                        inventory,
+                        discoveredOres: [...discoveredOres].filter(name => ORES.some(ore => ore.name === name)),
                         items: { ...emptyGameState().items, ...(saved.items || {}) },
-                        history: Array.isArray(saved.history) ? saved.history.slice(0, 24) : [],
+                        history,
                         gold: Math.max(0, Number(saved.gold) || 0),
                         streak: Math.max(0, Number(saved.streak) || 0),
                         lastRewardDate: typeof saved.lastRewardDate === "string" ? saved.lastRewardDate : null,
@@ -726,7 +748,7 @@
             elements.collectionList.replaceChildren();
             const discovered = ORES.filter(ore => Number(gameState.inventory[ore.name]) > 0);
             elements.progressTotal.textContent = `${gameState.totalRolls} ${gameState.totalRolls === 1 ? "discovery" : "discoveries"}`;
-            renderJournal(discovered);
+            renderJournal();
             if (!discovered.length) {
                 const empty = document.createElement("span");
                 empty.className = "collection-empty";
@@ -753,14 +775,25 @@
                 sellButton.textContent = `Sell 1 · ${getOreSellPrice(ore.name)} G`;
                 sellButton.disabled = Number(gameState.inventory[ore.name]) < 1;
                 sellButton.addEventListener("click", () => sellOre(ore.name));
-                item.append(oreLabel, count, rarity, sellButton);
+                const sellAllButton = document.createElement("button");
+                sellAllButton.className = "sell-button";
+                sellAllButton.type = "button";
+                sellAllButton.textContent = `Sell all · ${Number(gameState.inventory[ore.name]) * getOreSellPrice(ore.name)} G`;
+                sellAllButton.disabled = Number(gameState.inventory[ore.name]) < 1;
+                sellAllButton.addEventListener("click", () => sellAllOre(ore.name));
+                const sellActions = document.createElement("div");
+                sellActions.className = "sell-actions";
+                sellActions.append(sellButton, sellAllButton);
+                item.append(oreLabel, count, rarity, sellActions);
                 elements.collectionList.append(item);
             });
         }
 
-        function renderJournal(discovered) {
+        function renderJournal() {
             elements.journalList.replaceChildren();
-            elements.journalProgress.textContent = `${discovered.length} / ${ORES.length} discovered`;
+            const discoveredOres = new Set(gameState.discoveredOres);
+            const discoveredCount = ORES.filter(ore => discoveredOres.has(ore.name)).length;
+            elements.journalProgress.textContent = `${discoveredCount} / ${ORES.length} discovered`;
 
             const oresByRarity = new Map();
             for (const ore of ORES) {
@@ -778,7 +811,7 @@
                 const oreList = document.createElement("div");
                 oreList.className = "journal-ores";
                 for (const ore of ores) {
-                    const isDiscovered = Number(gameState.inventory[ore.name]) > 0;
+                    const isDiscovered = discoveredOres.has(ore.name);
                     const item = document.createElement("div");
                     item.className = `journal-ore${isDiscovered ? "" : " is-undiscovered"}`;
                     item.setAttribute("role", "group");
@@ -805,7 +838,7 @@
             if (sparkleImage) {
                 const sparkle = document.createElement("img");
                 sparkle.className = "rarity-sparkle";
-                sparkle.src = sparkleImage;
+                sparkle.src = assetPath(sparkleImage);
                 sparkle.alt = "";
                 sparkle.setAttribute("aria-hidden", "true");
                 rarity.append(sparkle);
@@ -827,7 +860,7 @@
                 title.className = "badge-title";
                 const image = document.createElement("img");
                 image.className = "badge-image";
-                image.src = badge.image;
+                image.src = assetPath(badge.image);
                 image.alt = "";
                 const name = document.createElement("strong");
                 name.textContent = `${badge.name}${owned ? " · Owned" : ""}`;
@@ -892,6 +925,16 @@
             updateEconomy();
         }
 
+        function sellAllOre(name) {
+            const count = Number(gameState.inventory[name]) || 0;
+            if (count < 1) return;
+            gameState.inventory[name] = 0;
+            gameState.gold += count * getOreSellPrice(name);
+            saveGameState();
+            renderCollection();
+            updateEconomy();
+        }
+
         function buyShopItem(id) {
             const shopItem = SHOP_ITEMS.find(item => item.id === id);
             if (!shopItem || !isShopItemUnlocked(shopItem) || gameState.gold < shopItem.price) return;
@@ -948,8 +991,8 @@
         function createOreVisual(ore, imageClass, fallbackColor = "#a4aaa3") {
             if (ore?.image) {
                 const image = document.createElement("img");
-                image.className = `ore-thumbnail ${imageClass}`;
-                image.src = ore.image;
+                image.className = `ore-thumbnail ${imageClass}${ore.name === "Coal" ? " coal-thumbnail" : ""}`;
+                image.src = assetPath(ore.image);
                 image.alt = "";
                 image.loading = "lazy";
                 image.addEventListener("error", () => {
@@ -970,6 +1013,7 @@
 
         function displayOre(ore) {
             elements.specimen.style.setProperty("--ore-color", ore.color);
+            elements.oreImage.classList.toggle("coal-thumbnail", ore.name === "Coal");
             elements.oreFallback.hidden = Boolean(ore.image);
             elements.oreImage.hidden = !ore.image;
             if (!ore.image) return;
@@ -978,7 +1022,7 @@
                 elements.oreImage.hidden = true;
                 elements.oreFallback.hidden = false;
             };
-            elements.oreImage.src = ore.image;
+            elements.oreImage.src = assetPath(ore.image);
         }
 
         function roll() {
@@ -1008,6 +1052,9 @@
 
             for (const result of results) {
                 gameState.inventory[result.ore.name] = (Number(gameState.inventory[result.ore.name]) || 0) + 1;
+                if (!gameState.discoveredOres.includes(result.ore.name)) {
+                    gameState.discoveredOres.push(result.ore.name);
+                }
                 gameState.history.unshift({
                     name: result.ore.name,
                     number: result.number,
