@@ -103,6 +103,7 @@
         .ore-swatch { flex: 0 0 auto; width: 9px; height: 9px; background: var(--ore-color, var(--lime)); transform: rotate(45deg); }
         .ore-thumbnail, .specimen-image, .badge-image, .recipe-image, .rarity-sparkle { display: block; max-width: 100%; object-fit: contain; image-rendering: pixelated; }
         .ore-thumbnail { flex: 0 0 auto; }
+        .ore-thumbnail.is-electrified, .ore-thumbnail-fallback.is-electrified, .specimen-image.is-electrified { filter: drop-shadow(0 0 2px #fff7a6) drop-shadow(0 0 7px #ffd21f); }
         .ore-thumbnail.coal-thumbnail, .specimen-image.coal-thumbnail { transform: scale(2); }
         .ore-thumbnail-fallback { flex: 0 0 auto; background: var(--ore-color, var(--lime)); clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%); }
         .collection-thumbnail, .collection-thumbnail-fallback { width: 40px; height: 40px; }
@@ -455,7 +456,8 @@
         };
         const BADGES = [
             { code: "boulder", name: "Boulder Badge", description: "Stone sells for 2 gold.", image: "Boulder_Badge.webp" },
-            { code: "cascade", name: "Cascade Badge", description: "Coral Ore has weight 2 when rolling.", image: "Cascade_Badge.webp" }
+            { code: "cascade", name: "Cascade Badge", description: "Coral Ore has weight 2 when rolling.", image: "Cascade_Badge.webp" },
+            { code: "thunder", name: "Thunder Badge", description: "Copper and Gold sell for 20% more and look electrified.", image: "thunder-badge.png" }
         ];
         const SHOP_ITEMS = [
             { id: "potion", name: "Potion", description: "A healing potion for your next expedition.", price: 10 },
@@ -643,7 +645,7 @@
         }
 
         function updateEconomy(dailyReward = 0) {
-            elements.goldBalance.textContent = `${gameState.gold} G`;
+            elements.goldBalance.textContent = `${formatGold(gameState.gold)} G`;
             elements.streakCount.textContent = `${gameState.streak} ${gameState.streak === 1 ? "day" : "days"}`;
             elements.dailyNote.textContent = dailyReward > 0
                 ? `Daily login reward: +${dailyReward} gold · ${gameState.streak}-day streak.`
@@ -772,13 +774,13 @@
                 const sellButton = document.createElement("button");
                 sellButton.className = "sell-button";
                 sellButton.type = "button";
-                sellButton.textContent = `Sell 1 · ${getOreSellPrice(ore.name)} G`;
+                sellButton.textContent = `Sell 1 · ${formatGold(getOreSellPrice(ore.name))} G`;
                 sellButton.disabled = Number(gameState.inventory[ore.name]) < 1;
                 sellButton.addEventListener("click", () => sellOre(ore.name));
                 const sellAllButton = document.createElement("button");
                 sellAllButton.className = "sell-button";
                 sellAllButton.type = "button";
-                sellAllButton.textContent = `Sell all · ${Number(gameState.inventory[ore.name]) * getOreSellPrice(ore.name)} G`;
+                sellAllButton.textContent = `Sell all · ${formatGold(Number(gameState.inventory[ore.name]) * getOreSellPrice(ore.name))} G`;
                 sellAllButton.disabled = Number(gameState.inventory[ore.name]) < 1;
                 sellAllButton.addEventListener("click", () => sellAllOre(ore.name));
                 const sellActions = document.createElement("div");
@@ -873,7 +875,18 @@
         }
 
         function getOreSellPrice(name) {
-            return name === "Stone" && gameState.badges.includes("boulder") ? 2 : ORE_SELL_PRICES[name];
+            const basePrice = name === "Stone" && gameState.badges.includes("boulder") ? 2 : ORE_SELL_PRICES[name];
+            return gameState.badges.includes("thunder") && (name === "Copper" || name === "Gold")
+                ? basePrice * 1.2
+                : basePrice;
+        }
+
+        function formatGold(amount) {
+            return Number(amount.toFixed(1)).toString();
+        }
+
+        function isOreElectrified(ore) {
+            return gameState.badges.includes("thunder") && (ore?.name === "Copper" || ore?.name === "Gold");
         }
 
         function isShopItemUnlocked(shopItem) {
@@ -919,7 +932,7 @@
             const count = Number(gameState.inventory[name]) || 0;
             if (count < 1) return;
             gameState.inventory[name] = count - 1;
-            gameState.gold += getOreSellPrice(name);
+            gameState.gold = Number((gameState.gold + getOreSellPrice(name)).toFixed(1));
             saveGameState();
             renderCollection();
             updateEconomy();
@@ -929,7 +942,7 @@
             const count = Number(gameState.inventory[name]) || 0;
             if (count < 1) return;
             gameState.inventory[name] = 0;
-            gameState.gold += count * getOreSellPrice(name);
+            gameState.gold = Number((gameState.gold + count * getOreSellPrice(name)).toFixed(1));
             saveGameState();
             renderCollection();
             updateEconomy();
@@ -972,7 +985,7 @@
             const code = elements.developerBadgeCode.value.trim().toLowerCase();
             const badge = BADGES.find(item => item.code === code);
             if (!badge) {
-                elements.developerMessage.textContent = "Unknown badge code. Use boulder or cascade.";
+                elements.developerMessage.textContent = "Unknown badge code. Use boulder, cascade, or thunder.";
                 return;
             }
             if (gameState.badges.includes(badge.code)) {
@@ -986,26 +999,28 @@
             renderBadges();
             renderCollection();
             renderSidebar();
+            const displayedOre = ORES.find(ore => ore.name === elements.resultName.textContent);
+            if (displayedOre) displayOre(displayedOre);
         }
 
         function createOreVisual(ore, imageClass, fallbackColor = "#a4aaa3") {
             if (ore?.image) {
                 const image = document.createElement("img");
-                image.className = `ore-thumbnail ${imageClass}${ore.name === "Coal" ? " coal-thumbnail" : ""}`;
+                image.className = `ore-thumbnail ${imageClass}${ore.name === "Coal" ? " coal-thumbnail" : ""}${isOreElectrified(ore) ? " is-electrified" : ""}`;
                 image.src = assetPath(ore.image);
                 image.alt = "";
                 image.loading = "lazy";
                 image.addEventListener("error", () => {
-                    image.replaceWith(createOreFallback(imageClass, ore.color));
+                    image.replaceWith(createOreFallback(imageClass, ore.color, isOreElectrified(ore)));
                 }, { once: true });
                 return image;
             }
-            return createOreFallback(imageClass, ore?.color || fallbackColor);
+            return createOreFallback(imageClass, ore?.color || fallbackColor, isOreElectrified(ore));
         }
 
-        function createOreFallback(imageClass, color) {
+        function createOreFallback(imageClass, color, electrified = false) {
             const fallback = document.createElement("span");
-            fallback.className = `ore-thumbnail-fallback ${imageClass}-fallback`;
+            fallback.className = `ore-thumbnail-fallback ${imageClass}-fallback${electrified ? " is-electrified" : ""}`;
             fallback.style.setProperty("--ore-color", color);
             fallback.setAttribute("aria-hidden", "true");
             return fallback;
@@ -1014,6 +1029,8 @@
         function displayOre(ore) {
             elements.specimen.style.setProperty("--ore-color", ore.color);
             elements.oreImage.classList.toggle("coal-thumbnail", ore.name === "Coal");
+            elements.oreImage.classList.toggle("is-electrified", isOreElectrified(ore));
+            elements.oreFallback.classList.toggle("is-electrified", isOreElectrified(ore));
             elements.oreFallback.hidden = Boolean(ore.image);
             elements.oreImage.hidden = !ore.image;
             if (!ore.image) return;
