@@ -105,6 +105,7 @@
         .ore-thumbnail { flex: 0 0 auto; }
         .ore-thumbnail.is-electrified, .ore-thumbnail-fallback.is-electrified, .specimen-image.is-electrified { filter: drop-shadow(0 0 2px #fff7a6) drop-shadow(0 0 7px #ffd21f); }
         .ore-thumbnail.coal-thumbnail, .specimen-image.coal-thumbnail { transform: scale(2); }
+        .ore-thumbnail.awaken-shard-thumbnail, .specimen-image.awaken-shard-thumbnail, .recipe-image.awaken-shard-thumbnail { transform: scale(1.35); }
         .ore-thumbnail-fallback { flex: 0 0 auto; background: var(--ore-color, var(--lime)); clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%); }
         .collection-thumbnail, .collection-thumbnail-fallback { width: 40px; height: 40px; }
         .history-thumbnail, .history-thumbnail-fallback { width: 32px; height: 32px; }
@@ -394,6 +395,16 @@
                     </div>
                     <button class="primary-button sidebar-action" id="craft-mega-stone" type="button">Craft polished stone</button>
                     <p class="owned-label" id="polished-count">Owned: 0</p>
+                    <div class="recipe-item">
+                        <img class="recipe-image awaken-shard-thumbnail" src="Awaken Shard.png" alt="Awaken Shard">
+                        <div>
+                            <h3 class="recipe-name">Awaken</h3>
+                            <p class="recipe-description">Craft an Awaken using Awaken Shards.</p>
+                            <p class="recipe-requirement" id="awaken-requirement">Requires 3 Awaken Shards</p>
+                        </div>
+                    </div>
+                    <button class="primary-button sidebar-action" id="craft-awaken" type="button">Craft Awaken</button>
+                    <p class="owned-label" id="awaken-count">Owned: 0</p>
                 </section>
 
                 <section class="panel sidebar-panel" aria-labelledby="shop-heading">
@@ -432,6 +443,7 @@
             { name: "Coral Ore", rarity: "Epic", color: "#bd79e8", weight: 1, image: "Coral Bar.png" },
             { name: "Moonstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Moonstone Bar.png" },
             { name: "Searstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Searstone Bar.png" },
+            { name: "Awaken Shard", rarity: "Champion", color: "#f05252", weight: 2, image: "Awaken Shard.png" },
             { name: "Mega Crystal", rarity: "Champion", color: "#f05252", weight: 0.05, image: "Mega Stone-Photoroom.png" }
         ];
         const RARITY_SPARKLE_IMAGES = {
@@ -452,6 +464,7 @@
             "Coral Ore": 90,
             Moonstone: 200,
             Searstone: 200,
+            "Awaken Shard": 100,
             "Mega Crystal": 500
         };
         const BADGES = [
@@ -497,6 +510,8 @@
             craftedCount: document.querySelector("#crafted-count"),
             polishedCount: document.querySelector("#polished-count"),
             recipeRequirement: document.querySelector("#recipe-requirement"),
+            awakenCount: document.querySelector("#awaken-count"),
+            awakenRequirement: document.querySelector("#awaken-requirement"),
             developerForm: document.querySelector("#developer-form"),
             developerGold: document.querySelector("#developer-gold"),
             developerBadgeForm: document.querySelector("#developer-badge-form"),
@@ -531,7 +546,7 @@
         updateSeasonalTheme();
 
         function emptyGameState() {
-            return { totalRolls: 0, inventory: {}, discoveredOres: [], items: { potion: 0, pokemon: 0, greatball: 0, battlefield: 0, polishedMegaStone: 0 }, history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
+            return { totalRolls: 0, inventory: {}, discoveredOres: [], items: { potion: 0, pokemon: 0, greatball: 0, battlefield: 0, polishedMegaStone: 0, awaken: 0 }, history: [], gold: 0, streak: 0, lastRewardDate: null, badges: [] };
         }
 
         function assetPath(filename) {
@@ -922,10 +937,15 @@
 
             const megaCrystalCount = Number(gameState.inventory["Mega Crystal"]) || 0;
             const craftedCount = Number(gameState.items.polishedMegaStone) || 0;
+            const awakenShardCount = Number(gameState.inventory["Awaken Shard"]) || 0;
+            const awakenCount = Number(gameState.items.awaken) || 0;
             elements.recipeRequirement.textContent = `Requires 1 Mega Crystal (Mega Stone) · Have ${megaCrystalCount}`;
+            elements.awakenRequirement.textContent = `Requires 3 Awaken Shards · Have ${awakenShardCount}`;
             document.querySelector("#craft-mega-stone").disabled = megaCrystalCount < 1;
+            document.querySelector("#craft-awaken").disabled = awakenShardCount < 3;
             elements.polishedCount.textContent = `Owned: ${craftedCount}`;
-            elements.craftedCount.textContent = `${craftedCount} crafted`;
+            elements.awakenCount.textContent = `Owned: ${awakenCount}`;
+            elements.craftedCount.textContent = `${craftedCount + awakenCount} crafted`;
         }
 
         function sellOre(name) {
@@ -961,6 +981,15 @@
             if ((Number(gameState.inventory["Mega Crystal"]) || 0) < 1) return;
             gameState.inventory["Mega Crystal"] -= 1;
             gameState.items.polishedMegaStone += 1;
+            saveGameState();
+            renderCollection();
+            updateEconomy();
+        }
+
+        function craftAwaken() {
+            if ((Number(gameState.inventory["Awaken Shard"]) || 0) < 3) return;
+            gameState.inventory["Awaken Shard"] -= 3;
+            gameState.items.awaken += 1;
             saveGameState();
             renderCollection();
             updateEconomy();
@@ -1006,7 +1035,7 @@
         function createOreVisual(ore, imageClass, fallbackColor = "#a4aaa3") {
             if (ore?.image) {
                 const image = document.createElement("img");
-                image.className = `ore-thumbnail ${imageClass}${ore.name === "Coal" ? " coal-thumbnail" : ""}${isOreElectrified(ore) ? " is-electrified" : ""}`;
+                image.className = `ore-thumbnail ${imageClass}${ore.name === "Coal" ? " coal-thumbnail" : ""}${ore.name === "Awaken Shard" ? " awaken-shard-thumbnail" : ""}${isOreElectrified(ore) ? " is-electrified" : ""}`;
                 image.src = assetPath(ore.image);
                 image.alt = "";
                 image.loading = "lazy";
@@ -1029,6 +1058,7 @@
         function displayOre(ore) {
             elements.specimen.style.setProperty("--ore-color", ore.color);
             elements.oreImage.classList.toggle("coal-thumbnail", ore.name === "Coal");
+            elements.oreImage.classList.toggle("awaken-shard-thumbnail", ore.name === "Awaken Shard");
             elements.oreImage.classList.toggle("is-electrified", isOreElectrified(ore));
             elements.oreFallback.classList.toggle("is-electrified", isOreElectrified(ore));
             elements.oreFallback.hidden = Boolean(ore.image);
@@ -1090,6 +1120,7 @@
         elements.authForm.addEventListener("submit", authenticate);
         document.querySelector("#sign-out").addEventListener("click", leaveGame);
         document.querySelector("#craft-mega-stone").addEventListener("click", craftPolishedMegaStone);
+        document.querySelector("#craft-awaken").addEventListener("click", craftAwaken);
         elements.developerForm.addEventListener("submit", addDeveloperGold);
         elements.developerBadgeForm.addEventListener("submit", grantDeveloperBadge);
         elements.rollButton.addEventListener("click", roll);
