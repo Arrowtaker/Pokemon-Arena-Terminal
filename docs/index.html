@@ -105,7 +105,7 @@
         .ore-thumbnail { flex: 0 0 auto; }
         .ore-thumbnail.is-electrified, .ore-thumbnail-fallback.is-electrified, .specimen-image.is-electrified { filter: drop-shadow(0 0 2px #fff7a6) drop-shadow(0 0 7px #ffd21f); }
         .ore-thumbnail.coal-thumbnail, .specimen-image.coal-thumbnail { transform: scale(2); }
-        .ore-thumbnail.awaken-shard-thumbnail, .specimen-image.awaken-shard-thumbnail, .recipe-image.awaken-shard-thumbnail { transform: scale(1.35); }
+        .ore-thumbnail.awaken-shard-thumbnail, .specimen-image.awaken-shard-thumbnail { transform: scale(1.35); }
         .ore-thumbnail-fallback { flex: 0 0 auto; background: var(--ore-color, var(--lime)); clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%); }
         .collection-thumbnail, .collection-thumbnail-fallback { width: 40px; height: 40px; }
         .history-thumbnail, .history-thumbnail-fallback { width: 32px; height: 32px; }
@@ -400,15 +400,15 @@
                     <button class="primary-button sidebar-action" id="craft-mega-stone" type="button">Craft polished stone</button>
                     <p class="owned-label" id="polished-count">Owned: 0</p>
                     <div class="recipe-item">
-                        <img class="recipe-image awaken-shard-thumbnail" src="Awaken Shard.png" alt="Awaken Shard">
+                        <img class="recipe-image" src="Awaken TM.png" alt="Awaken TM">
                         <div>
-                            <h3 class="recipe-name">Awaken</h3>
-                            <p class="recipe-description">Craft an Awaken using Awaken Shards.</p>
-                            <p class="recipe-requirement" id="awaken-requirement">Requires 3 Awaken Shards</p>
+                            <h3 class="recipe-name">Awaken TM</h3>
+                            <p class="recipe-description">Craft an Awaken TM using Awaken Shards.</p>
+                            <p class="recipe-requirement" id="awaken-tm-requirement">Requires 3 Awaken Shards</p>
                         </div>
                     </div>
-                    <button class="primary-button sidebar-action" id="craft-awaken" type="button">Craft Awaken</button>
-                    <p class="owned-label" id="awaken-count">Owned: 0</p>
+                    <button class="primary-button sidebar-action" id="craft-awaken-tm" type="button">Craft Awaken TM</button>
+                    <p class="owned-label" id="awaken-tm-count">Owned: 0</p>
                 </section>
 
                 <section class="panel sidebar-panel" aria-labelledby="shop-heading">
@@ -514,8 +514,8 @@
             craftedCount: document.querySelector("#crafted-count"),
             polishedCount: document.querySelector("#polished-count"),
             recipeRequirement: document.querySelector("#recipe-requirement"),
-            awakenCount: document.querySelector("#awaken-count"),
-            awakenRequirement: document.querySelector("#awaken-requirement"),
+            awakenTmCount: document.querySelector("#awaken-tm-count"),
+            awakenTmRequirement: document.querySelector("#awaken-tm-requirement"),
             developerForm: document.querySelector("#developer-form"),
             developerGold: document.querySelector("#developer-gold"),
             developerBadgeForm: document.querySelector("#developer-badge-form"),
@@ -972,11 +972,11 @@
             const awakenShardCount = Number(gameState.inventory["Awaken Shard"]) || 0;
             const awakenCount = Number(gameState.items.awaken) || 0;
             elements.recipeRequirement.textContent = `Requires 1 Mega Crystal (Mega Stone) · Have ${megaCrystalCount}`;
-            elements.awakenRequirement.textContent = `Requires 3 Awaken Shards · Have ${awakenShardCount}`;
+            elements.awakenTmRequirement.textContent = `Requires 3 Awaken Shards · Have ${awakenShardCount}`;
             document.querySelector("#craft-mega-stone").disabled = megaCrystalCount < 1;
-            document.querySelector("#craft-awaken").disabled = awakenShardCount < 3;
+            document.querySelector("#craft-awaken-tm").disabled = awakenShardCount < 3;
             elements.polishedCount.textContent = `Owned: ${craftedCount}`;
-            elements.awakenCount.textContent = `Owned: ${awakenCount}`;
+            elements.awakenTmCount.textContent = `Owned: ${awakenCount}`;
             elements.craftedCount.textContent = `${craftedCount + awakenCount} crafted`;
         }
 
@@ -1018,7 +1018,7 @@
             updateEconomy();
         }
 
-        function craftAwaken() {
+        function craftAwakenTM() {
             if ((Number(gameState.inventory["Awaken Shard"]) || 0) < 3) return;
             gameState.inventory["Awaken Shard"] -= 3;
             gameState.items.awaken += 1;
@@ -1152,7 +1152,7 @@
         elements.authForm.addEventListener("submit", authenticate);
         document.querySelector("#sign-out").addEventListener("click", leaveGame);
         document.querySelector("#craft-mega-stone").addEventListener("click", craftPolishedMegaStone);
-        document.querySelector("#craft-awaken").addEventListener("click", craftAwaken);
+        document.querySelector("#craft-awaken-tm").addEventListener("click", craftAwakenTM);
         elements.developerForm.addEventListener("submit", addDeveloperGold);
         elements.developerBadgeForm.addEventListener("submit", grantDeveloperBadge);
         elements.rollButton.addEventListener("click", roll);
