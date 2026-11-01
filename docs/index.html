@@ -729,8 +729,6 @@
                 if (ore.name === "Coral Ore" && gameState.badges.includes("cascade")) rate = 2.5;
                 return { ore, rate };
             });
-            const awakenShard = rates.find(entry => entry.ore.name === "Awaken Shard");
-            awakenShard.rate = 2.2;
             const stone = rates.find(entry => entry.ore.name === "Stone");
             const coal = rates.find(entry => entry.ore.name === "Coal");
             stone.rate = 50;
@@ -739,6 +737,10 @@
             const otherRatesTotal = otherRates.reduce((sum, entry) => sum + entry.rate, 0);
             const scale = 30 / otherRatesTotal;
             for (const entry of otherRates) entry.rate *= scale;
+            const awakenShard = rates.find(entry => entry.ore.name === "Awaken Shard");
+            const copper = rates.find(entry => entry.ore.name === "Copper");
+            copper.rate += awakenShard.rate - 1.35;
+            awakenShard.rate = 1.35;
             return rates;
         }
 
