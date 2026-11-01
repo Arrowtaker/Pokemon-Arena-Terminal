@@ -17,7 +17,7 @@
             --panel: #1a2720;
             --panel-soft: #202e26;
             --ground: #121c17;
-            --lime: #d4fa72;
+            --lime: #f05252;
             --rust: #e98d61;
             --mono: "DM Mono", monospace;
             --sans: "Space Grotesk", sans-serif;
@@ -58,7 +58,7 @@
         .brand-mark { display: grid; width: 27px; height: 27px; place-items: center; color: var(--ground); background: var(--lime); clip-path: polygon(25% 0, 75% 0, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0 75%, 0 25%); }
         .brand-mark svg { width: 16px; height: 16px; }
         .top-meta { gap: 9px; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
-        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px rgba(212, 250, 114, .75); }
+        .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 10px rgba(240, 82, 82, .75); }
         .account-bar { display: flex; align-items: center; gap: 12px; }
         .account-name { max-width: 180px; overflow: hidden; color: var(--ink); font-size: 12px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
         .account-button { padding: 6px 0; color: var(--muted); border: 0; background: transparent; font-size: 11px; cursor: pointer; }
@@ -73,10 +73,10 @@
         .event-note { position: relative; z-index: 1; width: min(340px, calc(100% - 90px)); margin: 0; padding: 9px 11px; font-size: 11px; line-height: 1.5; }
         body.halloween-theme .event-banner { display: flex; background: radial-gradient(ellipse at 82% 55%, rgba(136, 75, 139, .2), transparent 43%); }
         body.halloween-theme .event-note { color: #ffd3a4; border: 1px solid rgba(255, 155, 66, .3); background: rgba(74, 41, 67, .72); }
-        body.halloween-theme { --ink: #f4eee8; --muted: #aa9caf; --line: #49364e; --panel: #211a2b; --panel-soft: #2a2035; --ground: #110d18; --lime: #ff9b42; --rust: #df7bff; }
+        body.halloween-theme { --ink: #f4eee8; --muted: #aa9caf; --line: #49364e; --panel: #211a2b; --panel-soft: #2a2035; --ground: #110d18; --lime: #f05252; --rust: #df7bff; }
         body.halloween-theme { background-image: linear-gradient(rgba(255, 155, 66, .035) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 155, 66, .035) 1px, transparent 1px), radial-gradient(ellipse at 16% 0%, rgba(115, 66, 145, .22), transparent 40%); }
         body.halloween-theme .topbar { border-bottom-color: rgba(190, 142, 204, .18); background: rgba(17, 13, 24, .88); }
-        body.halloween-theme .live-dot { box-shadow: 0 0 10px rgba(255, 155, 66, .75); }
+        body.halloween-theme .live-dot { box-shadow: 0 0 10px rgba(240, 82, 82, .75); }
         body.halloween-theme .intro { color: #c0b4c4; }
         body.halloween-theme .panel { background: rgba(33, 26, 43, .96); }
         body.halloween-theme .field-label { color: #d0c5d2; }
@@ -165,7 +165,7 @@
         .badge-item:not(.is-owned) .badge-image { filter: grayscale(1); opacity: .45; }
         .badge-item strong { font-size: 10px; font-weight: 600; }
         .badge-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 9px; line-height: 1.4; }
-        .badge-item.is-owned { border-color: rgba(212, 250, 114, .45); }
+        .badge-item.is-owned { border-color: rgba(240, 82, 82, .45); }
         .badge-item.is-owned strong { color: var(--lime); }
         .sell-actions { display: grid; grid-column: 1 / -1; grid-template-columns: 1fr 1fr; gap: 6px; }
         .sell-button { min-height: 30px; padding: 0 8px; color: var(--lime); border: 1px solid #46564a; background: #152019; font-size: 10px; cursor: pointer; }
@@ -225,7 +225,7 @@
         .result-caption { z-index: 1; display: flex; align-items: center; justify-content: center; gap: 5px; margin-top: 5px; color: var(--muted); font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
         .roll-controls { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 18px 20px 20px; }
         .primary-button { display: flex; min-height: 48px; align-items: center; justify-content: center; gap: 10px; padding: 0 18px; color: #172019; border: 0; background: var(--lime); font-size: 13px; font-weight: 700; cursor: pointer; transition: background .18s, transform .18s; }
-        .primary-button:hover { background: #e2ff9c; transform: translateY(-1px); }
+        .primary-button:hover { background: #ff7777; transform: translateY(-1px); }
         .primary-button:active { transform: translateY(0); }
         .primary-button:disabled { opacity: .48; cursor: not-allowed; transform: none; }
         .primary-button svg { width: 17px; height: 17px; }
@@ -434,17 +434,17 @@
 
     <script>
         const ORES = [
-            { name: "Stone", rarity: "Common", color: "#a4aaa3", weight: 80, image: "Rock.png" },
-            { name: "Coal", rarity: "Common", color: "#a4aaa3", weight: 45, image: "Coal Ore.png" },
-            { name: "Copper", rarity: "Uncommon", color: "#55c878", weight: 35, image: "Copper Bar.png" },
+            { name: "Stone", rarity: "Common", color: "#a4aaa3", weight: 60, image: "Rock.png" },
+            { name: "Coal", rarity: "Common", color: "#a4aaa3", weight: 30, image: "Coal Ore.png" },
+            { name: "Copper", rarity: "Uncommon", color: "#55c878", weight: 25, image: "Copper Bar.png" },
             { name: "Iron", rarity: "Uncommon", color: "#55c878", weight: 10, image: "Iron Bar.png" },
-            { name: "Gold", rarity: "Rare", color: "#58aaf2", weight: 3, image: "Gold Bar.png" },
-            { name: "Quartz", rarity: "Rare", color: "#58aaf2", weight: 2, image: "Quartz Piece.png" },
-            { name: "Coral Ore", rarity: "Epic", color: "#bd79e8", weight: 1, image: "Coral Bar.png" },
-            { name: "Moonstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Moonstone Bar.png" },
-            { name: "Searstone", rarity: "Legendary", color: "#f39a4a", weight: 0.25, image: "Searstone Bar.png" },
-            { name: "Awaken Shard", rarity: "Champion", color: "#f05252", weight: 2, image: "Awaken Shard.png" },
-            { name: "Mega Crystal", rarity: "Champion", color: "#f05252", weight: 0.05, image: "Mega Stone-Photoroom.png" }
+            { name: "Gold", rarity: "Rare", color: "#58aaf2", weight: 5, image: "Gold Bar.png" },
+            { name: "Quartz", rarity: "Rare", color: "#58aaf2", weight: 4, image: "Quartz Piece.png" },
+            { name: "Coral Ore", rarity: "Epic", color: "#bd79e8", weight: 2.8, image: "Coral Bar.png" },
+            { name: "Moonstone", rarity: "Legendary", color: "#f39a4a", weight: 1, image: "Moonstone Bar.png" },
+            { name: "Searstone", rarity: "Legendary", color: "#f39a4a", weight: 1, image: "Searstone Bar.png" },
+            { name: "Awaken Shard", rarity: "Champion", color: "#f05252", weight: 3.5, image: "Awaken Shard.png" },
+            { name: "Mega Crystal", rarity: "Champion", color: "#f05252", weight: 0.2, image: "Mega Stone-Photoroom.png" }
         ];
         const RARITY_SPARKLE_IMAGES = {
             Common: "Common Sparkle.png",
@@ -469,7 +469,7 @@
         };
         const BADGES = [
             { code: "boulder", name: "Boulder Badge", description: "Stone sells for 2 gold.", image: "Boulder_Badge.webp" },
-            { code: "cascade", name: "Cascade Badge", description: "Coral Ore has weight 2 when rolling.", image: "Cascade_Badge.webp" },
+            { code: "cascade", name: "Cascade Badge", description: "Coral Ore has weight 4 when rolling.", image: "Cascade_Badge.webp" },
             { code: "thunder", name: "Thunder Badge", description: "Copper and Gold sell for 20% more and look electrified.", image: "thunder-badge.png" }
         ];
         const SHOP_ITEMS = [
@@ -718,9 +718,10 @@
 
         function pickOre() {
             const weightOf = ore => {
-                if (ore.name === "Moonstone" && isHalloweenEventActive()) return 0.35;
-                if (ore.name === "Coral Ore" && gameState.badges.includes("cascade")) return 2;
-                return ore.weight;
+                let weight = ore.weight;
+                if (ore.name === "Moonstone" && isHalloweenEventActive()) weight *= 1.4;
+                if (ore.name === "Coral Ore" && gameState.badges.includes("cascade")) weight = 4;
+                return weight;
             };
             const total = ORES.reduce((sum, ore) => sum + weightOf(ore), 0);
             let threshold = Math.random() * total;
