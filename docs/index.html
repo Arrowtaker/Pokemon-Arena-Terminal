@@ -459,20 +459,20 @@
             Champion: "Champion Sparkle.png"
         };
         const ORE_SELL_PRICES = {
-            Stone: 1,
-            Coal: 3,
-            Copper: 7,
-            Iron: 20,
-            Gold: 45,
-            Quartz: 60,
-            "Coral Ore": 75,
-            Moonstone: 110,
-            Searstone: 110,
-            "Awaken Shard": 100,
-            "Mega Crystal": 500
+            Stone: 0.65,
+            Coal: 1.95,
+            Copper: 4.55,
+            Iron: 13,
+            Gold: 29.25,
+            Quartz: 39,
+            "Coral Ore": 48.75,
+            Moonstone: 71.5,
+            Searstone: 71.5,
+            "Awaken Shard": 65,
+            "Mega Crystal": 325
         };
         const BADGES = [
-            { code: "boulder", name: "Boulder Badge", description: "Stone sells for 2 gold.", image: "Boulder_Badge.webp" },
+            { code: "boulder", name: "Boulder Badge", description: "Stone sells for 1.3 gold.", image: "Boulder_Badge.webp" },
             { code: "cascade", name: "Cascade Badge", description: "Increases Coral Ore's share of the remaining drop pool.", image: "Cascade_Badge.webp" },
             { code: "thunder", name: "Thunder Badge", description: "Copper and Gold sell for 20% more and look electrified.", image: "thunder-badge.png" }
         ];
@@ -922,7 +922,7 @@
         }
 
         function getOreSellPrice(name) {
-            const basePrice = name === "Stone" && gameState.badges.includes("boulder") ? 2 : ORE_SELL_PRICES[name];
+            const basePrice = name === "Stone" && gameState.badges.includes("boulder") ? 1.3 : ORE_SELL_PRICES[name];
             return gameState.badges.includes("thunder") && (name === "Copper" || name === "Gold")
                 ? basePrice * 1.2
                 : basePrice;
